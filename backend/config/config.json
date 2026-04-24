@@ -1,0 +1,16 @@
+{
+  "development": {
+    "username": "epicbook_user",
+    "password": "your_secure_db_password",
+    "database": "bookstore",
+    "host": "db",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "epicbook_user",
+    "password": "your_secure_db_password",
+    "database": "bookstore",
+    "host": "db",
+    "dialect": "mysql"
+  }
+}
