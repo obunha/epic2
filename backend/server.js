@@ -75,9 +75,13 @@ app.use("/", require("./routes/html-routes"));
 app.use("/cart", require("./routes/html-routes"));
 app.use("/gallery", require("./routes/html-routes"));
 
-// Sync database and start server
-db.sequelize.sync().then(function () {
-  app.listen(PORT, function () {
-    console.log(JSON.stringify({ time: new Date().toISOString(), event: "server_start", port: PORT }));
-  });
+// Start listening immediately so the healthcheck endpoint is reachable,
+// then sync the DB schema. If sync fails the /health endpoint will report
+// database: disconnected and return 503 until the connection succeeds.
+app.listen(PORT, function () {
+  console.log(JSON.stringify({ time: new Date().toISOString(), event: "server_start", port: PORT }));
+});
+
+db.sequelize.sync().catch(function (err) {
+  console.error(JSON.stringify({ time: new Date().toISOString(), event: "db_sync_error", error: err.message }));
 });

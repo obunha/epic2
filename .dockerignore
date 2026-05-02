@@ -1,0 +1,10 @@
+.git
+.gitignore
+.env*
+*.md
+docs/
+node_modules/
+*/node_modules/
+*.log
+logs/
+.github/

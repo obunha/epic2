@@ -18,11 +18,11 @@ services:
     networks:
       - epicbook_internal
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -u \"${MYSQL_USER}\" -p\"${MYSQL_PASSWORD}\" \"${MYSQL_DATABASE}\" -e 'SELECT 1' 2>/dev/null"]
       interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 30s
+      retries: 10
+      start_period: 40s
 
   # Backend Service (Node.js/Express with server-side rendering)
   # Build context is repo root so the Dockerfile can reach frontend/views and frontend/public
