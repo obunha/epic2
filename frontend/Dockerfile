@@ -1,38 +1,27 @@
-# Multi-stage build for frontend static site
-# Stage 1: Build stage (if needed for any preprocessing)
+# Multi-stage build — static asset image
+# NOTE: This image serves only static files (CSS/JS/images) via nginx.
+# The backend container handles server-side rendering and the API.
+# In the current Compose stack only the backend + proxy services run;
+# this image is built by CI and can be used as a CDN origin or asset cache.
+
+# Stage 1: placeholder — no build tools needed for pure static files
 FROM node:18-alpine AS builder
-
 WORKDIR /app
-
-# Copy source files
 COPY public ./public
-COPY views ./views
-COPY package.json ./
 
-# If there were build steps, they'd go here
-# For pure static files, we just copy as-is
-
-# Stage 2: Production nginx image
+# Stage 2: minimal nginx image with static assets only
 FROM nginx:alpine AS production
 
-# Remove default nginx config
 RUN rm /etc/nginx/conf.d/default.conf
 
-# Copy custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/
+COPY nginx.conf /etc/nginx/conf.d/app.conf
+COPY --from=builder /app/public /usr/share/nginx/html
 
-# Copy static files
-COPY --chown=nginx:nginx . /usr/share/nginx/html
-
-# Create log directory
 RUN mkdir -p /var/log/nginx && chown -R nginx:nginx /var/log/nginx
 
-# Expose port
 EXPOSE 80
 
-# Healthcheck
 HEALTHCHECK --interval=10s --timeout=5s --retries=3 \
     CMD wget -q --spider http://localhost/ || exit 1
 
-# Run nginx
 CMD ["nginx", "-g", "daemon off;"]
